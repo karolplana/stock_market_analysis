@@ -9,7 +9,7 @@ worked on developing the functions together.
 """
 import requests
 import json
-from datetime import date, timedelta
+from datetime import date
 
 def download_data(ticker: str) -> dict:
     """
@@ -29,6 +29,7 @@ def download_data(ticker: str) -> dict:
         print(base_url + path)
         #We must define the user agent so that the request is able to go through
         response = requests.get(base_url + path, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()
         historical_data = response.json()
         return historical_data
     except Exception as error:
@@ -45,30 +46,35 @@ def data_processing(stocks: dict) -> dict:
         dict: A dictionary containing the min, max, avg, and median of the closing prices.
     """
     #Create a list only containing the rows from the dictionary (i.e. information for each day)
-    stocks = list(stocks["data"]["tradesTable"]["rows"])
+    modified_stocks = list(stocks["data"]["tradesTable"]["rows"])
     #List to store the close values for future operations.
     close_values = []
 
-    for stock in stocks:
+    for stock in modified_stocks:
         close_price = float(stock["close"].replace('$',''))
         close_values.append(close_price)
 
     #Create the dictionary to return with the keys being set to the points of interest (min, max, etc.) and the values
     # are the values corresponding to those points
+    symbol = stocks["data"]["symbol"]
     max_close = max(close_values)
     min_close = min(close_values)
     avg_close = sum(close_values) / len(close_values)
     median_close = sorted(close_values)[len(close_values) // 2]
-    return {"max_close": max_close, "min_close": min_close, "avg_close": avg_close, "median_close": median_close}
+    return {"ticker": symbol, "max_close": max_close, "min_close": min_close, "avg_close": avg_close, "median_close": median_close}
 
 """Data Download Section"""
-data = download_data("aapl")
-file_path = "stocks.json"
+tickers = ["aapl", "msft", "googl", "amzn", "tsla"]
+filtered_tickers = []
+data_path = "raw_data.json"
+filtered_path = "stocks.json"
 
-#Write information to JSON file to verify functionality
-with open(file_path, "w") as file:
-    json.dump(data, file)
-
-print(f"JSON data written to {file_path}")
-
-print(data_processing(data))
+for ticker in tickers:
+    data = download_data(ticker)
+    # Write information to JSON file to verify functionality
+    with open(data_path, "w") as file:
+        json.dump(data, file, indent=4)
+        print(f"JSON data written to {data_path}")
+    filtered_tickers.append(data_processing(data))
+    with open(filtered_path, "w") as file:
+        json.dump(filtered_tickers, file, indent=4)
