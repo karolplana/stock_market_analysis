@@ -12,26 +12,5 @@
         "min_close": 135.42,
         "avg_close": 299.661240063593,
         "median_close": 287.18
-    },
-    {
-        "ticker": "GOOGL",
-        "max_close": 206.38,
-        "min_close": 52.7065,
-        "avg_close": 121.61506200317964,
-        "median_close": 122.127
-    },
-    {
-        "ticker": "AMZN",
-        "max_close": 242.06,
-        "min_close": 81.82,
-        "avg_close": 149.4860433227345,
-        "median_close": 155.2
-    },
-    {
-        "ticker": "TSLA",
-        "max_close": 479.86,
-        "min_close": 24.0813,
-        "avg_close": 220.8562418918919,
-        "median_close": 222.96
     }
 ]
