@@ -3,6 +3,9 @@ Author:     Karol Planadeball
 Assignment: Stock Market Data Analysis
 Due Date:   2/10/2025
 Version:    1.0
+AI Usage Disclaimers: Copilot and ChatGPT were heavily used to explore implementations of dictionary methods as well
+as give explanations to many of the lines of code provided. This code was also created with the help of Grant Bowers. We
+worked on developing the functions together.
 """
 import requests
 import json
@@ -32,6 +35,32 @@ def download_data(ticker: str) -> dict:
         print(f"Exception occurred {error}")
         return {}
 
+def data_processing(stocks: dict) -> dict:
+    """
+    Purpose:
+        Processes data from downloaded stocks json. Finds the min, max, avg, and median of the closing prices.
+    Args:
+        stocks(dict): A dictionary containing the stocks' data.
+    Returns:
+        dict: A dictionary containing the min, max, avg, and median of the closing prices.
+    """
+    #Create a list only containing the rows from the dictionary (i.e. information for each day)
+    stocks = list(stocks["data"]["tradesTable"]["rows"])
+    #List to store the close values for future operations.
+    close_values = []
+
+    for stock in stocks:
+        close_price = float(stock["close"].replace('$',''))
+        close_values.append(close_price)
+
+    #Create the dictionary to return with the keys being set to the points of interest (min, max, etc.) and the values
+    # are the values corresponding to those points
+    max_close = max(close_values)
+    min_close = min(close_values)
+    avg_close = sum(close_values) / len(close_values)
+    median_close = sorted(close_values)[len(close_values) // 2]
+    return {"max_close": max_close, "min_close": min_close, "avg_close": avg_close, "median_close": median_close}
+
 """Data Download Section"""
 data = download_data("aapl")
 file_path = "stocks.json"
@@ -41,3 +70,5 @@ with open(file_path, "w") as file:
     json.dump(data, file)
 
 print(f"JSON data written to {file_path}")
+
+print(data_processing(data))
